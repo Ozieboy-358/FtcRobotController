@@ -174,8 +174,8 @@ public class KF_DEV_DEBUG extends LinearOpMode {
         private void slideMotorInit(
                 String[] motorNames
         ) {
-            for (int i = 0; i <= motorNames.length; i++) {
-                slides[i] = hardwareMap.dcMotor.get(motorNames[i]);
+            for (int i = 0; i <=slideMotorNames.length; i++) {
+                slides[i] = hardwareMap.dcMotor.get(slideMotorNames[i]);
             }
         }
         /* Seperator */

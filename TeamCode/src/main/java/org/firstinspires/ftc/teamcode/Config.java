@@ -9,13 +9,13 @@ This should NOT contain any instructions and should only contain information spe
 */
 public class Config {
     // Motor mappings
-    static String teamName = "olympians"; // "olympians" "titans"
+    static String teamName = "titans"; // "olympians" "titans"
 
     static String[] quadBaseMotorNames = {"left motor 1", "left motor 2", "right motor 1", "right motor 2"};
     // static String[] quadBaseMotorNamesTitans = {"leftFront","leftRear","rightFront","rightRear"};
     // static String[] quadBaseMotorNamesTitans = {"frontleft", "backleft", "frontright", "backright"};
     static String[] whinchPulleyMotorNames = {"wench", "pully"};
-    static String[] slideMotorNames = {"slide1", "slide2"};
+    static String[] slideMotorNames = {"slide1"};
     static String grabServoName = "grab";
     double headingError = 0.01;
     static String camName = "Webcam 1";

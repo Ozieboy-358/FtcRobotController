@@ -5,7 +5,6 @@ import android.util.Size;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -24,8 +23,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
-@TeleOp(name = "TeleOpCurrent", group = "Linear OpMode")
-public class KF_DEV_DEBUG extends LinearOpMode {
+@Autonomous(name = "EmergencyAuto", group = "Linear OpMode")
+public class SuperAuto extends LinearOpMode {
 
     @Override
     public void runOpMode() {
@@ -603,6 +602,7 @@ public class KF_DEV_DEBUG extends LinearOpMode {
                 }
                 roboCam = new RoboCam(config.fileName, config.resolution, config.resolution);
             }
+
             /*
             81 centimeters for leg 1, 47 or 221 centimeters depending on position (whether the robot
             starts in the back or the front) for leg 2, and 66 centimeters for leg three.
@@ -619,6 +619,7 @@ public class KF_DEV_DEBUG extends LinearOpMode {
                 }
                 fieldState = strFieldState;
             } // pick one at random right now.
+
             void leg1_movement() {
                 driveDistance(81, 1, 0);
                 turnToHeading(1, 90);
@@ -690,7 +691,7 @@ public class KF_DEV_DEBUG extends LinearOpMode {
             ) {
                 resWidth = resWidthIn;
                 resHeight = resHeightIn;
-          //      tFodProcessor = new TfodProcessor.Builder().setModelFileName(fileNameStr).build();
+                //  tFodProcessor = new TfodProcessor.Builder().setModelFileName(fileNameStr).build();
                 aprilTagProcessor = new AprilTagProcessor.Builder().build();
                 visPortal = new VisionPortal.Builder()
                         .setCamera(hardwareMap.get(WebcamName.class, camName))

@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp (name = "OlympDrive")
+@TeleOp(name = "Olymp Drive")
 public class centerOlymp extends LinearOpMode {
 
     private DcMotor pully = null;

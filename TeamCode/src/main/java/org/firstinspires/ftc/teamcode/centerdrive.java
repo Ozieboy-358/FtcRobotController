@@ -7,12 +7,10 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp (name = "centerdrive")
+@TeleOp(name = "Titan centerdrive")
 public class centerdrive extends LinearOpMode {
 
     private DcMotor slide1 = null;
-    private DcMotor slide2 = null;
-    private Servo grab = null;
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -22,9 +20,8 @@ public class centerdrive extends LinearOpMode {
         DcMotor motorBackLeft = hardwareMap.dcMotor.get("left motor 2");
         DcMotor motorFrontRight = hardwareMap.dcMotor.get("right motor 1");
         DcMotor motorBackRight = hardwareMap.dcMotor.get("right motor 2");
-        grab = hardwareMap.servo.get("grab");
         slide1 = hardwareMap.dcMotor.get("slide1");
-        slide2 = hardwareMap.dcMotor.get("slide2");
+
 
         // Reverse the right side motors
         // Reverse left motors if you are using NeveRests
@@ -76,27 +73,17 @@ public class centerdrive extends LinearOpMode {
             }
 
                 if (gamepad2. left_trigger>0){
-                    slide2.setPower(-100);
+
                     slide1.setPower(100);
                 }
                 else if (gamepad2.right_trigger>0){
                     slide1.setPower(-100);
-                    slide2.setPower(100);
+
                 }
                 else {
                     slide1.setPower(0);
-                    slide2.setPower(0);
+
                 }
-
-                if (gamepad2.a){
-                    grab.setPosition(0.12);
-                }
-                if (gamepad2.x){
-                    grab.setPosition(.34);
-                }
-
-
-
 
         }
     }

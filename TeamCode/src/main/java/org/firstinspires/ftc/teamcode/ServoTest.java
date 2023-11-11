@@ -51,17 +51,16 @@ public class ServoTest extends LinearOpMode {
            Wench.setPower(0);
        }
 
-       if (gamepad2.left_bumper=true) {
-            Pulley.setPower(-100);
+       if (gamepad2.left_bumper) {
+           Pulley.setPower(-100);
        }
-        if (gamepad2.right_bumper=true) {
-            Wench.setPower(-100);
+       if (gamepad2.right_bumper) {
+           Wench.setPower(-100);
+       } else {
+           Pulley.setPower(0);
+           Wench.setPower(0);
        }
-else {
-    Pulley.setPower(0);
-    Wench.setPower(0);
-       }
-       if (gamepad2.a){
+       if (gamepad2.a) {
            grab.setPosition(0.12);
        }
        if (gamepad2.x){

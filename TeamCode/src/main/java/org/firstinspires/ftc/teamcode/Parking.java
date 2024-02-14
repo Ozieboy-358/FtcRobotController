@@ -1,17 +1,3 @@
-
-Conversation opened. 1 unread message.
-
-Skip to content
-Using Marion CUSD # 2 Mail with screen readers
-1 of 76
-(no subject)
-External
-Inbox
-
-Oswald Aviles <oswaldaviles358@gmail.com>
-4:42 PM (0 minutes ago)
-to me
-
 /* Copyright (c) 2022 FIRST. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -41,26 +27,41 @@ to me
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.Powerplay;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
+
+
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.imgproc.Moments;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvPipeline;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -109,18 +110,14 @@ import java.util.List;
  *  Use Android Studio to Copy this Class, and Paste it into your "TeamCode" folder with a new name.
  *  Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
-
-@Autonomous(name="Titan Encoder Auto", group="Robot")
-public class TitanEncoder extends LinearOpMode {
+@Autonomous(name="Simple Park", group="Robot")
+public class Parking extends LinearOpMode {
 
     /* Declare OpMode members. */
     private DcMotor leftMotor1 = null;
     private DcMotor leftMotor2 = null;
     private DcMotor rightMotor1 = null;
     private DcMotor rightMotor2 = null;
-    private DcMotor slide1 = null;
-    private DcMotor slide2 = null;
-    private Servo grab = null;
     private BNO055IMU imu = null;      // Control/Expansion Hub IMU
 
     private double robotHeading = 0;
@@ -136,6 +133,9 @@ public class TitanEncoder extends LinearOpMode {
     private double rightSpeed = 0;
     private int leftTarget = 0;
     private int rightTarget = 0;
+    int toStage = 60;
+    double bluside = -0.4;
+
 
     // Calculate the COUNTS_PER_INCH for your specific drive train.
     // Go to your motor vendor website to determine your motor's COUNTS_PER_MOTOR_REV
@@ -152,6 +152,7 @@ public class TitanEncoder extends LinearOpMode {
     // These constants define the desired driving/control characteristics
     // They can/should be tweaked to suit the specific robot drive train.
     static final double DRIVE_SPEED = 0.4;     // Max driving speed for better distance accuracy.
+    static double STRAFE_SPEED = 0.4;     // Max driving speed for better distance accuracy.
     static final double TURN_SPEED = 0.2;     // Max Turn speed to limit turn rate
     static final double HEADING_THRESHOLD = 1.0;    // How close must the heading get to the target before moving to next step.
     // Requiring more accuracy (a smaller number) will often make the turn take longer to get into the final position.
@@ -161,24 +162,20 @@ public class TitanEncoder extends LinearOpMode {
     // Decrease these numbers if the heading does not settle on the correct value (eg: very agile robot with omni wheels)
     static final double P_TURN_GAIN = 0.02;     // Larger is more responsive, but also less stable
     static final double P_DRIVE_GAIN = 0.03;     // Larger is more responsive, but also less stable
+    double cX = 0;
+    double cY = 0;
+    double width = 0;
 
-    private static final String TFOD_MODEL_ASSET = "olympiansleeve.tflite";
-    // private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
+    private OpenCvCamera controlHubCam;  // Use OpenCvCamera class from FTC SDK
 
+    // Constants for camera resolution
+    private static final int CAMERA_WIDTH = 640;
+    private static final int CAMERA_HEIGHT = 360;
 
-    private static final String[] LABELS = {
-            "ftc",
-            "hacksi",
-            "mars"
-    };
-    boolean targetvisible = false;
-    String target = "";
-
-    private static final String VUFORIA_KEY =   "AWraR1f/////AAABmbbCZ736HECJhYZY/maMJdFl+PjPB/N08oOsu7ykF3Ngs2qNjVrpUfvkIYhgrKrybAku9P1hxCRQQUCFvfct4217Xo5Ls1jBDKgOnaLzk2tmidLoWNXR7IJn2RMEjP6Mv83uK3hvz4TIqRCRCcW8Mm2EJDz+Lb+evobFdWCCtWYnr3PEqzbcb0bpVzfp8iLcOcZnorCOE2rN1ol1EwiMEsqC6QZWLoYbfk5sP8GKjCAOxwR/2PHIdbAkN1OMp6eJHVkgK6Lz4A3siDLkp36UJkhV7oEYhnDjqtOm+jVE1ZtiBLWf8gHOtg29lrLYAKiMvtH7FzhUU2n60bzwAm1GpZ5sYHiPOJqtctmHXlMdkVLL ";
-    private VuforiaLocalizer vuforia;
-    private TFObjectDetector tfod;
-
-
+    // Constants for distance calculation
+    public static final double objectWidthInRealWorldUnits = 3.75;
+    public static final double focalLength = 728;
+    public String path;
 
 
     @Override
@@ -189,9 +186,9 @@ public class TitanEncoder extends LinearOpMode {
         leftMotor2 = hardwareMap.dcMotor.get("left motor 2");
         rightMotor1 = hardwareMap.dcMotor.get("right motor 1");
         rightMotor2 = hardwareMap.dcMotor.get("right motor 2");
-        grab = hardwareMap.servo.get("grab");
-        slide1 = hardwareMap.dcMotor.get("slide1");
-        slide2 = hardwareMap.dcMotor.get("slide2");
+        Servo liftL = hardwareMap.servo.get("liftL");
+        Servo liftR = hardwareMap.servo.get("liftR");
+        initOpenCV();
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
@@ -199,20 +196,14 @@ public class TitanEncoder extends LinearOpMode {
         rightMotor1.setDirection(DcMotor.Direction.REVERSE);
         rightMotor2.setDirection(DcMotor.Direction.REVERSE);
 
-        initVuforia();
-        initTfod();
-
-        if (tfod != null) {
-            tfod.activate();
-        }
-
-        tfod.setZoom(1.0, 16.0 / 9.0);
-
-
         // define initialization values for IMU, and then initialize it.
+
+
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+
         imu.initialize(parameters);
 
         // Ensure the robot is stationary.  Reset the encoders and set the motors to BRAKE mode
@@ -225,9 +216,26 @@ public class TitanEncoder extends LinearOpMode {
         leftMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        boolean far = false;
+        boolean blue = false;
+        if (gamepad1.b){
+            blue = true;
+        }
+        if (gamepad1.y){
+            far = true;
+        }
+
+        waitForStart();
+
+
+
         // Wait for the game to start (Display Gyro value while waiting)
         while (opModeInInit()) {
-            telemetry.addData(">", "Robot Heading = %4.0f", getRawHeading());
+            telemetry.addData("Coordinate", "(" + (int) cX + ", " + (int) cY + ")");
+            telemetry.addData("Distance in Inch", getDistance(width));
+            telemetry.addLine("Path :" + path);
+            telemetry.addLine("Y = Far :" + far);
+            telemetry.addLine("B = Blue :" + blue);
             telemetry.update();
         }
 
@@ -238,66 +246,32 @@ public class TitanEncoder extends LinearOpMode {
         rightMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         resetHeading();
 
+        controlHubCam.stopRecordingPipeline();
         // Step through each leg of the path,
         // Notes:   Reverse movement is obtained by setting a negative distance (not speed)
         //          holdHeading() is used after turns to let the heading stabilize
         //          Add a sleep(2000) after any step to keep the telemetry data visible for review
-        List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-        if (updatedRecognitions != null) {
-            telemetry.addData("# Objects Detected", updatedRecognitions.size());
-
-            // step through the list of recognitions and display image position/size information for each one
-            // Note: "Image number" refers to the randomized image orientation/number
-            if (opModeIsActive()) {
-                for (Recognition recognition : updatedRecognitions) {
-                    if (recognition.getLabel().equals("hacksi") && recognition.getConfidence() * 100 >= 74) {
-                        targetvisible = true;
-                        target = "hacksi";
-                    }
-                    if (recognition.getLabel().equals("ftc") && recognition.getConfidence() * 100 >= 74) {
-                        targetvisible = true;
-                        target = "ftc";
-                    }
-                    if (recognition.getLabel().equals("mars") && recognition.getConfidence() * 100 >= 74) {
-                        targetvisible = true;
-                        target = "mars";
-                    }
-
-                    telemetry.addData("", " ");
-                    telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
-                    telemetry.addData("new", target);
-                    telemetry.update();
-                }
-            }
-
-            grab.setPosition(.34);
-            sleep(100);
-            arm(100);
-            sleep(100);
-            arm(0);
-            sleep(100);
-            driveStraight(DRIVE_SPEED,1,0);
-            reset();
-
-            if (target.equals("ftc")) {
-                driveStraight(DRIVE_SPEED,32,-0);
-            }
-            if (target.equals("hacksi")) {
-                StrafeDist(DRIVE_SPEED,-22,-0);
-                reset();
-                driveStraight(DRIVE_SPEED,32,-0);
-            }
-            if (target.equals("mars")) {
-                StrafeDist(.3,22,-0);
-                reset();
-                driveStraight(DRIVE_SPEED,32,-0);
-            }
-
-            telemetry.addData("Path", "Complete");
-            telemetry.update();
-            sleep(1000);  // Pause to display last telemetry message.
-
+        if (far){
+            toStage = 4 *24;
         }
+        else {
+            toStage =2 * 24;
+        }
+        if (blue){
+            STRAFE_SPEED = bluside;
+        }
+
+        liftL.setPosition(.7);
+        liftR.setPosition(.25);
+
+        driveStraight(DRIVE_SPEED,52,0);
+        StrafeDist(-STRAFE_SPEED,toStage,0);
+
+
+
+        telemetry.addData("Path", "Complete");
+        telemetry.update();
+        sleep(1000);  // Pause to display last telemetry message.
     }
 
     /*
@@ -610,53 +584,114 @@ public class TitanEncoder extends LinearOpMode {
         leftMotor2.setPower(leftSpeed);
         rightMotor1.setPower(rightSpeed);
     }
+    private void initOpenCV() {
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+                "cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
-    private void initVuforia() {
-        /*
-         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
-         */
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+        // Use OpenCvCameraFactory class from FTC SDK to create camera instance
+        controlHubCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
-        parameters.vuforiaLicenseKey = VUFORIA_KEY;
-        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
+        controlHubCam.setPipeline(new BlueBlobDetectionPipeline());
 
-        //  Instantiate the Vuforia engine
-        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+        controlHubCam.openCameraDevice();
+        controlHubCam.startStreaming(CAMERA_WIDTH, CAMERA_HEIGHT, OpenCvCameraRotation.UPRIGHT);
+        telemetry.addLine("OpenCv ready");
+
     }
 
-    /**
-     * Initialize the TensorFlow Object Detection engine.
-     */
-    private void initTfod() {
-        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
-                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.75f;
-        tfodParameters.isModelTensorFlow2 = true;
-        tfodParameters.inputSize = 300;
-        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+    class BlueBlobDetectionPipeline extends OpenCvPipeline {
+        @Override
+        public Mat processFrame(Mat input) {
+            // Preprocess the frame to detect blue regions
+            Mat blueMask = preprocessFrame(input);
 
-        // Use loadModelFromAsset() if the TF Model is built in as an asset by Android Studio
-        // Use loadModelFromFile() if you have downloaded a custom team model to the Robot Controller's FLASH.
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
-        // tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
-    }
-    public void reset(){
-        leftMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            // Find contours of the detected blue regions
+            List<MatOfPoint> contours = new ArrayList<>();
+            Mat hierarchy = new Mat();
+            Imgproc.findContours(blueMask, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
-        leftMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            // Find the largest blue contour (blob)
+            MatOfPoint largestContour = findLargestContour(contours);
+
+            if (largestContour != null) {
+                // Draw a blue outline around the largest detected object
+                Imgproc.drawContours(input, contours, contours.indexOf(largestContour), new Scalar(0, 0, 255), 2);
+
+                // Calculate the width of the bounding box
+                width = calculateWidth(largestContour);
+
+                // Display the width next to the label
+                String widthLabel = "Width: " + (int) width + " pixels";
+                Imgproc.putText(input, widthLabel, new Point(cX + 10, cY + 20), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(255, 0, 0), 2);
+
+                // Display the Distance
+                String distanceLabel = "Distance: " + String.format("%.2f", getDistance(width)) + " inches";
+                Imgproc.putText(input, distanceLabel, new Point(cX + 10, cY + 60), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(255, 0, 0), 2);
+
+                // Calculate the centroid of the largest contour
+                Moments moments = Imgproc.moments(largestContour);
+                cX = moments.get_m10() / moments.get_m00();
+                cY = moments.get_m01() / moments.get_m00();
+                if ((int)cX<200){
+                    path = "LEFT";
+                }
+                else   if ((int)cX>=200 && (int)cX<=400) {
+                    path = "CENTER";
+                }
+                else   if ((int)cX>400){
+                    path = "RIGHT";
+                }
+
+                // Draw a dot at the centroid
+                String label = "(" + (int) cX + ", " + (int) cY + ")";
+                Imgproc.putText(input, label, new Point(cX + 10, cY), Imgproc.FONT_HERSHEY_COMPLEX, 0.5, new Scalar(255, 0, 0), 2);
+                Imgproc.circle(input, new Point(cX, cY), 5, new Scalar(255, 0, 0), -1);
+            }
+
+            return input;
+        }
+
+        private Mat preprocessFrame(Mat frame) {
+            Mat hsvFrame = new Mat();
+            Imgproc.cvtColor(frame, hsvFrame, Imgproc.COLOR_BGR2HSV);
+
+            Scalar lowerBlue = new Scalar(90, 100, 100);
+            Scalar upperBlue = new Scalar(130, 255, 255);
+
+            Mat blueMask = new Mat();
+            Core.inRange(hsvFrame, lowerBlue, upperBlue, blueMask);
+
+            Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(5, 5));
+            Imgproc.morphologyEx(blueMask, blueMask, Imgproc.MORPH_OPEN, kernel);
+            Imgproc.morphologyEx(blueMask, blueMask, Imgproc.MORPH_CLOSE, kernel);
+
+            return blueMask;
+        }
+
+        private MatOfPoint findLargestContour(List<MatOfPoint> contours) {
+            double maxArea = 0;
+            MatOfPoint largestContour = null;
+
+            for (MatOfPoint contour : contours) {
+                double area = Imgproc.contourArea(contour);
+                if (area > maxArea) {
+                    maxArea = area;
+                    largestContour = contour;
+                }
+            }
+
+            return largestContour;
+        }
+
+        private double calculateWidth(MatOfPoint contour) {
+            Rect boundingRect = Imgproc.boundingRect(contour);
+            return boundingRect.width;
+        }
     }
-    public void arm(double power){
-        slide1.setPower(power*100);
-        slide2.setPower(power*60);
+
+    private static double getDistance(double width) {
+        double distance = (objectWidthInRealWorldUnits * focalLength) / width;
+        return distance;
     }
+
 }
-
-
-

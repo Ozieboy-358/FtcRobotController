@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -72,6 +73,8 @@ import java.util.List;
  */
 
 @Autonomous(name = "Auto_Blue_Left", group = "Robot")
+@Disabled
+
 public class Auto_Blue_Left extends LinearOpMode {
 
     /* Declare OpMode members. */
@@ -282,9 +285,9 @@ public class Auto_Blue_Left extends LinearOpMode {
         Negative heading turns right vice versa
         HoldTime is in Seconds
         */
-        StrafeDist(-DRIVE_SPEED, 44, 0);
+        StrafeDist(DRIVE_SPEED, 44, 0);
         // Save more CPU resources when camera is no longer needed.
-        visionPortal.close();
+
 
     }   // end method runOpMode()
 

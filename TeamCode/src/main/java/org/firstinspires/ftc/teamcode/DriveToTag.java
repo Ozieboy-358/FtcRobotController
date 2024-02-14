@@ -77,6 +77,8 @@ import java.util.concurrent.TimeUnit;
  *
  */
 
+@Disabled
+
 @TeleOp(name="Tank Drive To AprilTag", group = "Concept")
 public class DriveToTag extends LinearOpMode
 {

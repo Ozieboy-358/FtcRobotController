@@ -1,12 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 /* Important info to know
 This is a config file with all values that are predefined for our bot, mostly to cut down on complications.
 This should be tailored to the specifications of each bot and pulled from for opmodes.
 This should NOT contain any instructions and should only contain information specifically related to bootstraps.
 */
+@Disabled
+
 public class Config {
     // Motor mappings
     static String teamName = "titans"; // "olympians" "titans"

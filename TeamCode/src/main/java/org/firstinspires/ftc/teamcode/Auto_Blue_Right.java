@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -72,6 +73,8 @@ import java.util.List;
  */
 
 @Autonomous(name = "Auto_Blue_Right", group = "Robot")
+@Disabled
+
 public class Auto_Blue_Right extends LinearOpMode {
 
     /* Declare OpMode members. */
@@ -91,7 +94,7 @@ public class Auto_Blue_Right extends LinearOpMode {
     private boolean targetFound = false;
 
 
-    private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
+  //  private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
 
     /**
      * The variable to store our instance of the AprilTag processor.
@@ -115,7 +118,7 @@ public class Auto_Blue_Right extends LinearOpMode {
     private int leftTarget = 0;
     private int rightTarget = 0;
 
-    private void initAprilTag() {
+  /*  private void initAprilTag() {
 
         // Create the AprilTag processor.
         aprilTag = new AprilTagProcessor.Builder()
@@ -135,15 +138,19 @@ public class Auto_Blue_Right extends LinearOpMode {
 
                 .build();
 
+   */
+
         // Create the vision portal by using a builder.
-        VisionPortal.Builder builder = new VisionPortal.Builder();
+     //   VisionPortal.Builder builder = new VisionPortal.Builder();
 
         // Set the camera (webcam vs. built-in RC phone camera).
-        if (USE_WEBCAM) {
+     /*   if (USE_WEBCAM) {
             builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
         } else {
             builder.setCamera(BuiltinCameraDirection.BACK);
         }
+
+      */
 
         // Choose a camera resolution. Not all cameras support all resolutions.
         //builder.setCameraResolution(new Size(640, 480));
@@ -160,15 +167,15 @@ public class Auto_Blue_Right extends LinearOpMode {
         //builder.setAutoStopLiveView(false);
 
         // Set and enable the processor.
-        builder.addProcessor(aprilTag);
+     //   builder.addProcessor(aprilTag);
 
         // Build the Vision Portal, using the above settings.
-        visionPortal = builder.build();
+        //  visionPortal = builder.build();
 
         // Disable or re-enable the aprilTag processor at any time.
         //visionPortal.setProcessorEnabled(aprilTag, true);
 
-    }   // end method initAprilTag()
+//    }  // end method initAprilTag()
 
     // Calculate the COUNTS_PER_INCH for your specific drive train.
     // Go to your motor vendor website to determine your motor's COUNTS_PER_MOTOR_REV
@@ -238,8 +245,8 @@ public class Auto_Blue_Right extends LinearOpMode {
             telemetry.addData(">", "Robot Heading = %4.0f", getRawHeading());
             telemetry.update();
 
-            initAprilTag();
-            initTfod();
+           // initAprilTag();
+           // initTfod();
 
             // Wait for the DS start button to be touched.
             telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
@@ -264,7 +271,7 @@ public class Auto_Blue_Right extends LinearOpMode {
 
                     // Share the CPU.
                     sleep(20);
-                }
+
             }
         }
 
@@ -282,9 +289,10 @@ public class Auto_Blue_Right extends LinearOpMode {
         Negative heading turns right vice versa
         HoldTime is in Seconds
         */
-        StrafeDist(-DRIVE_SPEED, 92, 0);
+        StrafeDist(DRIVE_SPEED, 92, 0);
         // Save more CPU resources when camera is no longer needed.
-        visionPortal.close();
+
+    }
 
     }   // end method runOpMode()
 
@@ -732,11 +740,13 @@ public class Auto_Blue_Right extends LinearOpMode {
         VisionPortal.Builder builder = new VisionPortal.Builder();
 
         // Set the camera (webcam vs. built-in RC phone camera).
-        if (USE_WEBCAM) {
+     /*   if (USE_WEBCAM) {
             builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
         } else {
             builder.setCamera(BuiltinCameraDirection.BACK);
         }
+
+      */
 
         // Choose a camera resolution. Not all cameras support all resolutions.
         //builder.setCameraResolution(new Size(640, 480));

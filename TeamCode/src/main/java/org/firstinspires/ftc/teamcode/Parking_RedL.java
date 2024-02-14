@@ -1,35 +1,64 @@
-        package org.firstinspires.ftc.teamcode;
+/* Copyright (c) 2022 FIRST. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted (subject to the limitations in the disclaimer below) provided that
+ * the following conditions are met:
+ *
+ * Redistributions of source code must retain the above copyright notice, this list
+ * of conditions and the following disclaimer.
+ *
+ * Redistributions in binary form must reproduce the above copyright notice, this
+ * list of conditions and the following disclaimer in the documentation and/or
+ * other materials provided with the distribution.
+ *
+ * Neither the name of FIRST nor the names of its contributors may be used to endorse or
+ * promote products derived from this software without specific prior written permission.
+ *
+ * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
+ * LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
-        import com.qualcomm.hardware.bosch.BNO055IMU;
-        import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-        import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-        import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-        import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-        import com.qualcomm.robotcore.hardware.DcMotor;
-        import com.qualcomm.robotcore.hardware.Servo;
-        import com.qualcomm.robotcore.util.ElapsedTime;
-        import com.qualcomm.robotcore.util.Range;
+package org.firstinspires.ftc.teamcode;
 
-        import org.firstinspires.ftc.robotcore.external.ClassFactory;
-        import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
-        import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-        import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-        import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-        import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-        import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-        import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-        import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-        import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
-        import org.firstinspires.ftc.vision.VisionPortal;
-        import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-        import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
-        import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-        import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.ExposureControl;
-        import org.firstinspires.ftc.robotcore.external.hardware.camera.controls.GainControl;
-        import org.firstinspires.ftc.vision.tfod.TfodProcessor;
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
-        import java.util.List;
-        import java.util.concurrent.TimeUnit;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.imgproc.Moments;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvPipeline;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *  This file illustrates the concept of driving an autonomous path based on Gyro heading and encoder counts.
@@ -77,42 +106,20 @@
  *  Use Android Studio to Copy this Class, and Paste it into your "TeamCode" folder with a new name.
  *  Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
-
-@Autonomous(name = "Auto_Red_Right", group = "Robot")
-@Disabled
-public class Auto_Red_Right extends LinearOpMode {
+@Autonomous(name="Parking RedL", group="Robot")
+public class Parking_RedL extends LinearOpMode {
 
     /* Declare OpMode members. */
     private DcMotor leftMotor1 = null;
     private DcMotor leftMotor2 = null;
     private DcMotor rightMotor1 = null;
     private DcMotor rightMotor2 = null;
-    private DcMotor slide1 = null;
-    private DcMotor slide2 = null;
-    private Servo grab = null;
     private BNO055IMU imu = null;      // Control/Expansion Hub IMU
 
     private double robotHeading = 0;
     private double headingOffset = 0;
     private double headingError = 0;
 
-    private boolean targetFound = false;
-
-
-    private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
-
-    /**
-     * The variable to store our instance of the AprilTag processor.
-     */
-    private AprilTagProcessor aprilTag;
-
-    private TfodProcessor tfod;
-
-
-    /**
-     * The variable to store our instance of the vision portal.
-     */
-    private VisionPortal visionPortal;
     // These variable are declared here (as class members) so they can be updated in various methods,
     // but still be displayed by sendTelemetry()
     private double targetHeading = 0;
@@ -122,61 +129,6 @@ public class Auto_Red_Right extends LinearOpMode {
     private double rightSpeed = 0;
     private int leftTarget = 0;
     private int rightTarget = 0;
-
-    private void initAprilTag() {
-
-        // Create the AprilTag processor.
-        aprilTag = new AprilTagProcessor.Builder()
-                .setDrawAxes(true)
-                .setDrawCubeProjection(true)
-                .setDrawTagOutline(true)
-                .setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
-                .setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
-               .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
-
-                // == CAMERA CALIBRATION ==
-                // If you do not manually specify calibration parameters, the SDK will attempt
-                // to load a predefined calibration for your camera.
-                //.setLensIntrinsics(578.272, 578.272, 402.145, 221.506)
-
-                // ... these parameters are fx, fy, cx, cy.
-
-                .build();
-
-        // Create the vision portal by using a builder.
-        VisionPortal.Builder builder = new VisionPortal.Builder();
-
-        // Set the camera (webcam vs. built-in RC phone camera).
-        if (USE_WEBCAM) {
-            builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
-        } else {
-            builder.setCamera(BuiltinCameraDirection.BACK);
-        }
-
-        // Choose a camera resolution. Not all cameras support all resolutions.
-        //builder.setCameraResolution(new Size(640, 480));
-
-        // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
-        //builder.enableCameraMonitoring(true);
-
-        // Set the stream format; MJPEG uses less bandwidth than default YUY2.
-        //builder.setStreamFormat(VisionPortal.StreamFormat.YUY2);
-
-        // Choose whether or not LiveView stops if no processors are enabled.
-        // If set "true", monitor shows solid orange screen if no processors enabled.
-        // If set "false", monitor shows camera view without annotations.
-        //builder.setAutoStopLiveView(false);
-
-        // Set and enable the processor.
-        builder.addProcessor(aprilTag);
-
-        // Build the Vision Portal, using the above settings.
-        visionPortal = builder.build();
-
-        // Disable or re-enable the aprilTag processor at any time.
-        //visionPortal.setProcessorEnabled(aprilTag, true);
-
-    }   // end method initAprilTag()
 
     // Calculate the COUNTS_PER_INCH for your specific drive train.
     // Go to your motor vendor website to determine your motor's COUNTS_PER_MOTOR_REV
@@ -202,20 +154,33 @@ public class Auto_Red_Right extends LinearOpMode {
     // Decrease these numbers if the heading does not settle on the correct value (eg: very agile robot with omni wheels)
     static final double P_TURN_GAIN = 0.02;     // Larger is more responsive, but also less stable
     static final double P_DRIVE_GAIN = 0.03;     // Larger is more responsive, but also less stable
-    private static final int DESIRED_TAG_ID = 0;     // Choose the tag you want to approach or set to -1 for ANY tag.
-    private AprilTagDetection desiredTag = null;     // Used to hold the data for a detected AprilTag
+    double cX = 0;
+    double cY = 0;
+    double width = 0;
+
+    private OpenCvCamera controlHubCam;  // Use OpenCvCamera class from FTC SDK
+
+    // Constants for camera resolution
+    private static final int CAMERA_WIDTH = 640;
+    private static final int CAMERA_HEIGHT = 360;
+
+    // Constants for distance calculation
+    public static final double objectWidthInRealWorldUnits = 3.75;
+    public static final double focalLength = 728;
+    public String path;
+
 
     @Override
     public void runOpMode() {
-        boolean targetFound = false;    // Set to true when an AprilTag target is detected
-        double drive = 0;        // Desired forward power/speed (-1 to +1)
-        double strafe = 0;        // Desired strafe power/speed (-1 to +1)
-        double turn = 0;        // Desired turning power/speed (-1 to +1)
+
         // Initialize the drive system variables.
         leftMotor1 = hardwareMap.dcMotor.get("left motor 1");
         leftMotor2 = hardwareMap.dcMotor.get("left motor 2");
         rightMotor1 = hardwareMap.dcMotor.get("right motor 1");
         rightMotor2 = hardwareMap.dcMotor.get("right motor 2");
+        Servo liftL = hardwareMap.servo.get("liftL");
+        Servo liftR = hardwareMap.servo.get("liftR");
+        initOpenCV();
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
@@ -223,11 +188,14 @@ public class Auto_Red_Right extends LinearOpMode {
         rightMotor1.setDirection(DcMotor.Direction.REVERSE);
         rightMotor2.setDirection(DcMotor.Direction.REVERSE);
 
-
         // define initialization values for IMU, and then initialize it.
+
+
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+
         imu.initialize(parameters);
 
         // Ensure the robot is stationary.  Reset the encoders and set the motors to BRAKE mode
@@ -240,66 +208,43 @@ public class Auto_Red_Right extends LinearOpMode {
         leftMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-
+        waitForStart();
 
         // Wait for the game to start (Display Gyro value while waiting)
         while (opModeInInit()) {
-
-            telemetry.addData(">", "Robot Heading = %4.0f", getRawHeading());
+            telemetry.addData("Coordinate", "(" + (int) cX + ", " + (int) cY + ")");
+            telemetry.addData("Distance in Inch", getDistance(width));
+            telemetry.addLine("Path :" + path);
             telemetry.update();
-
-            initAprilTag();
-            initTfod();
-
-            // Wait for the DS start button to be touched.
-            telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
-            telemetry.addData(">", "Touch Play to start OpMode");
-            telemetry.update();
-            waitForStart();
-
-            if (opModeIsActive()) {
-                while (opModeIsActive()) {
-
-                  //  telemetryAprilTag();
-
-                    // Push telemetry to the Driver Station.
-                    telemetry.update();
-
-                    // Save CPU resources; can resume streaming when needed.
-                    if (gamepad1.dpad_down) {
-                        visionPortal.stopStreaming();
-                    } else if (gamepad1.dpad_up) {
-                        visionPortal.resumeStreaming();
-                    }
-
-                    // Share the CPU.
-                    sleep(20);
-                }
-            }
-            visionPortal.close();
         }
 
 
+        // Set the encoders for closed loop speed control, and reset the heading.
+        leftMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        leftMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        rightMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        resetHeading();
+
+        controlHubCam.stopRecordingPipeline();
         // Step through each leg of the path,
         // Notes:   Reverse movement is obtained by setting a negative distance (not speed)
         //          holdHeading() is used after turns to let the heading stabilize
         //          Add a sleep(2000) after any step to keep the telemetry data visible for review
 
-/*
-reset()
-driveStraight
-holdHeading
-StrafeDist
-Negative heading turns right vice versa
-HoldTime is in Seconds
-*/
-        StrafeDist(-DRIVE_SPEED, 44, 0);
-          // Save more CPU resources when camera is no longer needed.
+        liftL.setPosition(.7);
+        liftR.setPosition(.25);
+        driveStraight(.4,58,0 );
+turnToHeading(1, -88 );
+driveStraight(.4, 87, -88);
+StrafeDist(.4, 7, -88);
 
 
-    }   // end method runOpMode()
 
-
+        telemetry.addData("Path", "Complete");
+        telemetry.update();
+        sleep(1000);  // Pause to display last telemetry message.
+    }
 
     /*
      * ====================================================================================================
@@ -388,7 +333,30 @@ HoldTime is in Seconds
      *                     0 = fwd. +ve is CCW from fwd. -ve is CW from forward.
      *                     If a relative angle is required, add/subtract from current heading.
      */
+    public void turnToHeading(double maxTurnSpeed, double heading) {
 
+        // Run getSteeringCorrection() once to pre-calculate the current error
+        getSteeringCorrection(heading, P_DRIVE_GAIN);
+
+        // keep looping while we are still active, and not on heading.
+        while (opModeIsActive() && (Math.abs(headingError) > HEADING_THRESHOLD)) {
+
+            // Determine required steering to keep on heading
+            turnSpeed = getSteeringCorrection(heading, P_TURN_GAIN);
+
+            // Clip the speed to the maximum permitted value.
+            turnSpeed = Range.clip(turnSpeed, -maxTurnSpeed, maxTurnSpeed);
+
+            // Pivot in place by applying the turning correction
+            moveRobot(0, turnSpeed);
+
+            // Display drive status for the driver.
+            sendTelemetry(false);
+        }
+
+        // Stop all motion;
+        moveRobot(0, 0);
+    }
 
     /**
      * Method to obtain & hold a heading for a finite amount of time
@@ -424,7 +392,6 @@ HoldTime is in Seconds
         // Stop all motion;
         moveRobot(0, 0);
     }
-
 
     // **********  LOW Level driving functions.  ********************
 
@@ -570,7 +537,6 @@ HoldTime is in Seconds
             rightMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
     }
-
     public void strafeRobot(double drive) {
         driveSpeed = drive;     // save this value as a class member so it can be used by telemetry.
         ;      // save this value as a class member so it can be used by telemetry.
@@ -590,216 +556,114 @@ HoldTime is in Seconds
         leftMotor2.setPower(leftSpeed);
         rightMotor1.setPower(rightSpeed);
     }
+    private void initOpenCV() {
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+                "cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
-    /**
-     * Initialize the TensorFlow Object Detection engine.
-     */
-    public void reset() {
-        leftMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        // Use OpenCvCameraFactory class from FTC SDK to create camera instance
+        controlHubCam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
 
-        leftMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        controlHubCam.setPipeline(new BlueBlobDetectionPipeline());
+
+        controlHubCam.openCameraDevice();
+        controlHubCam.startStreaming(CAMERA_WIDTH, CAMERA_HEIGHT, OpenCvCameraRotation.UPRIGHT);
+        telemetry.addLine("OpenCv ready");
+
     }
 
-  /*  private void telemetryAprilTag() {
+    class BlueBlobDetectionPipeline extends OpenCvPipeline {
+        @Override
+        public Mat processFrame(Mat input) {
+            // Preprocess the frame to detect blue regions
+            Mat blueMask = preprocessFrame(input);
 
-        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-        telemetry.addData("# AprilTags Detected", currentDetections.size());
+            // Find contours of the detected blue regions
+            List<MatOfPoint> contours = new ArrayList<>();
+            Mat hierarchy = new Mat();
+            Imgproc.findContours(blueMask, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
-        // Step through the list of detections and display info for each one.
-        for (AprilTagDetection detection : currentDetections) {
-            if (detection.metadata != null) {
-                telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
-                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
-                telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
-                telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
-            } else {
-                telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
-                telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
-            }
-        }   // end for() loop
+            // Find the largest blue contour (blob)
+            MatOfPoint largestContour = findLargestContour(contours);
 
-        // Add "key" information to telemetry
-        telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
-        telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
-        telemetry.addLine("RBE = Range, Bearing & Elevation");
+            if (largestContour != null) {
+                // Draw a blue outline around the largest detected object
+                Imgproc.drawContours(input, contours, contours.indexOf(largestContour), new Scalar(0, 0, 255), 2);
 
-    }   // end method telemetryAprilTag()
+                // Calculate the width of the bounding box
+                width = calculateWidth(largestContour);
 
-    // while (opModeIsActive())
-    {
-        targetFound = false;
-        desiredTag = null;
+                // Display the width next to the label
+                String widthLabel = "Width: " + (int) width + " pixels";
+                Imgproc.putText(input, widthLabel, new Point(cX + 10, cY + 20), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(255, 0, 0), 2);
 
-        // Step through the list of detected tags and look for a matching tag
-        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-        for (AprilTagDetection detection : currentDetections) {
-            if ((detection.metadata != null) &&
-                    ((DESIRED_TAG_ID < 0) || (detection.id == DESIRED_TAG_ID))) {
-                targetFound = true;
-                desiredTag = detection;
-                break;  // don't look any further.
-            } else {
-                telemetry.addData("Unknown Target", "Tag ID %d is not in TagLibrary\n", detection.id);
-            }
-        }
+                // Display the Distance
+                String distanceLabel = "Distance: " + String.format("%.2f", getDistance(width)) + " inches";
+                Imgproc.putText(input, distanceLabel, new Point(cX + 10, cY + 60), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar(255, 0, 0), 2);
 
-        // Tell the driver what we see, and what to do.
-        if (targetFound) {
-            telemetry.addData(">", "HOLD Left-Bumper to Drive to Target\n");
-            telemetry.addData("Target", "ID %d (%s)", desiredTag.id, desiredTag.metadata.name);
-            telemetry.addData("Range", "%5.1f inches", desiredTag.ftcPose.range);
-            telemetry.addData("Bearing", "%3.0f degrees", desiredTag.ftcPose.bearing);
-            telemetry.addData("Yaw", "%3.0f degrees", desiredTag.ftcPose.yaw);
-        } else {
-            telemetry.addData(">", "Drive using joysticks to find valid target\n");
-        }
-
-        // If Left Bumper is being pressed, AND we have found the desired target, Drive to target Automatically .
-        if (gamepad1.left_bumper && targetFound) {
-
-            // Determine heading, range and Yaw (tag image rotation) error so we can use them to control the robot automatically.
-
-            double headingError = desiredTag.ftcPose.bearing;
-            double yawError = desiredTag.ftcPose.yaw;
-
-            // Use the speed and turn "gains" to calculate how we want the robot to move.
-
-
-            // Set the encoders for closed loop speed control, and reset the heading.
-            leftMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            leftMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rightMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            rightMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            resetHeading();
-        }
-    }
-
-   */
-             public void turnToHeading( double maxTurnSpeed, double heading){
-
-                // Run getSteeringCorrection() once to pre-calculate the current error
-                getSteeringCorrection(heading, P_DRIVE_GAIN);
-
-                // keep looping while we are still active, and not on heading.
-                while (opModeIsActive() && (Math.abs(headingError) > HEADING_THRESHOLD)) {
-
-                    // Determine required steering to keep on heading
-                    turnSpeed = getSteeringCorrection(heading, P_TURN_GAIN);
-
-                    // Clip the speed to the maximum permitted value.
-                    turnSpeed = Range.clip(turnSpeed, -maxTurnSpeed, maxTurnSpeed);
-
-                    // Pivot in place by applying the turning correction
-                    moveRobot(0, turnSpeed);
-
-                    // Display drive status for the driver.
-                    sendTelemetry(false);
+                // Calculate the centroid of the largest contour
+                Moments moments = Imgproc.moments(largestContour);
+                cX = moments.get_m10() / moments.get_m00();
+                cY = moments.get_m01() / moments.get_m00();
+                if ((int)cX<200){
+                    path = "LEFT";
+                }
+                else   if ((int)cX>=200 && (int)cX<=400) {
+                    path = "CENTER";
+                }
+                else   if ((int)cX>400){
+                    path = "RIGHT";
                 }
 
-                // Stop all motion;
-                moveRobot(0, 0);
+                // Draw a dot at the centroid
+                String label = "(" + (int) cX + ", " + (int) cY + ")";
+                Imgproc.putText(input, label, new Point(cX + 10, cY), Imgproc.FONT_HERSHEY_COMPLEX, 0.5, new Scalar(255, 0, 0), 2);
+                Imgproc.circle(input, new Point(cX, cY), 5, new Scalar(255, 0, 0), -1);
             }
 
+            return input;
+        }
 
+        private Mat preprocessFrame(Mat frame) {
+            Mat hsvFrame = new Mat();
+            Imgproc.cvtColor(frame, hsvFrame, Imgproc.COLOR_BGR2HSV);
 
-    /*
-     * This OpMode illustrates the basics of TensorFlow Object Detection,
-     * including Java Builder structures for specifying Vision parameters.
-     *
-     * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
-     * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
-     */
+            Scalar lowerBlue = new Scalar(90, 100, 100);
+            Scalar upperBlue = new Scalar(130, 255, 255);
 
+            Mat blueMask = new Mat();
+            Core.inRange(hsvFrame, lowerBlue, upperBlue, blueMask);
 
-        /**
-         * Initialize the TensorFlow Object Detection processor.
-         */
+            Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(5, 5));
+            Imgproc.morphologyEx(blueMask, blueMask, Imgproc.MORPH_OPEN, kernel);
+            Imgproc.morphologyEx(blueMask, blueMask, Imgproc.MORPH_CLOSE, kernel);
 
-        private void initTfod() {
+            return blueMask;
+        }
 
-            // Create the TensorFlow processor by using a builder.
-            tfod = new TfodProcessor.Builder()
+        private MatOfPoint findLargestContour(List<MatOfPoint> contours) {
+            double maxArea = 0;
+            MatOfPoint largestContour = null;
 
-                    // Use setModelAssetName() if the TF Model is built in as an asset.
-                    // Use setModelFileName() if you have downloaded a custom team model to the Robot Controller.
-                    //.setModelAssetName(TFOD_MODEL_ASSET)
-                    //.setModelFileName(TFOD_MODEL_FILE)
-
-                    //.setModelLabels(LABELS)
-                    //.setIsModelTensorFlow2(true)
-                    //.setIsModelQuantized(true)
-                    //.setModelInputSize(300)
-                    //.setModelAspectRatio(16.0 / 9.0)
-
-                    .build();
-
-            // Create the vision portal by using a builder.
-            VisionPortal.Builder builder = new VisionPortal.Builder();
-
-            // Set the camera (webcam vs. built-in RC phone camera).
-            if (USE_WEBCAM) {
-                builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
-            } else {
-                builder.setCamera(BuiltinCameraDirection.BACK);
+            for (MatOfPoint contour : contours) {
+                double area = Imgproc.contourArea(contour);
+                if (area > maxArea) {
+                    maxArea = area;
+                    largestContour = contour;
+                }
             }
 
-            // Choose a camera resolution. Not all cameras support all resolutions.
-            //builder.setCameraResolution(new Size(640, 480));
+            return largestContour;
+        }
 
-            // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
-            //builder.enableCameraMonitoring(true);
+        private double calculateWidth(MatOfPoint contour) {
+            Rect boundingRect = Imgproc.boundingRect(contour);
+            return boundingRect.width;
+        }
+    }
 
-            // Set the stream format; MJPEG uses less bandwidth than default YUY2.
-            //builder.setStreamFormat(VisionPortal.StreamFormat.YUY2);
+    private static double getDistance(double width) {
+        double distance = (objectWidthInRealWorldUnits * focalLength) / width;
+        return distance;
+    }
 
-            // Choose whether or not LiveView stops if no processors are enabled.
-            // If set "true", monitor shows solid orange screen if no processors enabled.
-            // If set "false", monitor shows camera view without annotations.
-            //builder.setAutoStopLiveView(false);
-
-            // Set and enable the processor.
-            builder.addProcessor(tfod);
-
-            // Build the Vision Portal, using the above settings.
-            visionPortal = builder.build();
-
-            // Set confidence threshold for TFOD recognitions, at any time.
-            //tfod.setMinResultConfidence(0.75f);
-
-            // Disable or re-enable the TFOD processor at any time.
-            //visionPortal.setProcessorEnabled(tfod, true);
-
-        }   // end method initTfod()
-
-        /**
-         * Add telemetry about TensorFlow Object Detection (TFOD) recognitions.
-         */
-        private void telemetryTfod() {
-
-            List<Recognition> currentRecognitions = tfod.getRecognitions();
-            telemetry.addData("# Objects Detected", currentRecognitions.size());
-
-            // Step through the list of recognitions and display info for each one.
-            for (Recognition recognition : currentRecognitions) {
-                double x = (recognition.getLeft() + recognition.getRight()) / 2 ;
-                double y = (recognition.getTop()  + recognition.getBottom()) / 2 ;
-
-                telemetry.addData(""," ");
-                telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
-                telemetry.addData("- Position", "%.0f / %.0f", x, y);
-                telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
-            }   // end for() loop
-
-        }   // end method telemetryTfod()
-
-    }   // end class
-
-
-
-
+}

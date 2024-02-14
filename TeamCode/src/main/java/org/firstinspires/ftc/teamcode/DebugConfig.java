@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
@@ -27,6 +28,8 @@ This is a config file with all values that are predefined for our bot, mostly to
 This should be tailored to the specifications of each bot and pulled from for opmodes.
 This should NOT contain any instructions and should only contain information specifically related to bootstraps.
  */
+@Disabled
+
 public class DebugConfig {
     // Motor mappings
     // static String[] quadBaseMotorNamesTitans = {"left motor 1", "left motor 2", "right motor 1", "right motor 2"};

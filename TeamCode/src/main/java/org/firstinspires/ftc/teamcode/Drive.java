@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -52,6 +53,7 @@ import com.qualcomm.robotcore.util.Range;
  * Also add a new OpMode, select the sample ConceptExternalHardwareClass.java, and select TeleOp.
  *
  */
+@Disabled
 
 public class Drive {
 

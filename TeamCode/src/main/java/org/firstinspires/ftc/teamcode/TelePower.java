@@ -30,8 +30,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
             telemetry.addData("Left Motor 2 Power: ", leftMotor2.getPower());
             telemetry.addData("Right Motor 1 Power: ", rightMotor1.getPower());
             telemetry.addData("Right Motor 2 Power: ", rightMotor2.getPower());
-            telemetry.addData("Slide 1 Power:", slide1.getPower());
-            telemetry.addData("Slide 2 Power:", slide2.getPower());
+
             telemetry.update();
         }
 
@@ -61,7 +60,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
         }
 
 
-        public void driverLoop() {
+        public void driveLoop() {
             // Driving control "telemetry"
             telemetry.addData("Status", "Running: " + runtime.toString());
             telemetry.addData("RightX", gamepad1.right_stick_x);
@@ -136,7 +135,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
         @Override
         public void loop() {
-            driverLoop();
+            driveLoop();
             telemetrys();
             gunnerLoop();
         }

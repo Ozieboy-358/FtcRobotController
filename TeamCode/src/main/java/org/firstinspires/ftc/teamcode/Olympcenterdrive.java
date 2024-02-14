@@ -26,6 +26,7 @@ public class Olympcenterdrive extends LinearOpMode {
         slide1 = hardwareMap.dcMotor.get("slide1");
         slide2 = hardwareMap.dcMotor.get("slide2");
 
+
         // Reverse the right side motors
         // Reverse left motors if you are using NeveRests
         motorFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);

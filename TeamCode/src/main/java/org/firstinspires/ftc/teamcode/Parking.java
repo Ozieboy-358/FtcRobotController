@@ -186,9 +186,7 @@ public class Parking extends LinearOpMode {
         leftMotor2 = hardwareMap.dcMotor.get("left motor 2");
         rightMotor1 = hardwareMap.dcMotor.get("right motor 1");
         rightMotor2 = hardwareMap.dcMotor.get("right motor 2");
-        Servo liftL = hardwareMap.servo.get("liftL");
-        Servo liftR = hardwareMap.servo.get("liftR");
-        initOpenCV();
+
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
         // When run, this OpMode should start both motors driving forward. So adjust these two lines based on your first test drive.
@@ -216,28 +214,13 @@ public class Parking extends LinearOpMode {
         leftMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        boolean far = false;
-        boolean blue = false;
-        if (gamepad1.b){
-            blue = true;
-        }
-        if (gamepad1.y){
-            far = true;
-        }
+
 
         waitForStart();
 
 
 
         // Wait for the game to start (Display Gyro value while waiting)
-        while (opModeInInit()) {
-            telemetry.addData("Coordinate", "(" + (int) cX + ", " + (int) cY + ")");
-            telemetry.addData("Distance in Inch", getDistance(width));
-            telemetry.addLine("Path :" + path);
-            telemetry.addLine("Y = Far :" + far);
-            telemetry.addLine("B = Blue :" + blue);
-            telemetry.update();
-        }
 
         // Set the encoders for closed loop speed control, and reset the heading.
         leftMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -246,26 +229,17 @@ public class Parking extends LinearOpMode {
         rightMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         resetHeading();
 
-        controlHubCam.stopRecordingPipeline();
+
         // Step through each leg of the path,
         // Notes:   Reverse movement is obtained by setting a negative distance (not speed)
         //          holdHeading() is used after turns to let the heading stabilize
         //          Add a sleep(2000) after any step to keep the telemetry data visible for review
-        if (far){
-            toStage = 4 *24;
-        }
-        else {
-            toStage =2 * 24;
-        }
-        if (blue){
-            STRAFE_SPEED = bluside;
-        }
 
-        liftL.setPosition(.7);
-        liftR.setPosition(.25);
 
-        driveStraight(DRIVE_SPEED,52,0);
-        StrafeDist(-STRAFE_SPEED,toStage,0);
+
+        driveStraight(DRIVE_SPEED,-45,-90);
+        turnToHeading(TURN_SPEED,-90);
+
 
 
 

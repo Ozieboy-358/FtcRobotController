@@ -34,6 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -181,6 +182,8 @@ public class Parking_BluR extends LinearOpMode {
         leftMotor2 = hardwareMap.dcMotor.get("left motor 2");
         rightMotor1 = hardwareMap.dcMotor.get("right motor 1");
         rightMotor2 = hardwareMap.dcMotor.get("right motor 2");
+        Servo liftL = hardwareMap.servo.get("liftL");
+        Servo liftR = hardwareMap.servo.get("liftR");
         initOpenCV();
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
@@ -232,8 +235,11 @@ public class Parking_BluR extends LinearOpMode {
         //          holdHeading() is used after turns to let the heading stabilize
         //          Add a sleep(2000) after any step to keep the telemetry data visible for review
 
-driveStraight(.4,50,0);
-StrafeDist(.4,4*24,0);
+        liftL.setPosition(.7);
+        liftR.setPosition(.25);
+        driveStraight(.4, 51, 0);
+        turnToHeading(1, 92);
+        driveStraight(.4, 89, 92);
 
         telemetry.addData("Path", "Complete");
         telemetry.update();

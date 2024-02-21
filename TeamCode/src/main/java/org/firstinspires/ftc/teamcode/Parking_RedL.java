@@ -234,10 +234,9 @@ public class Parking_RedL extends LinearOpMode {
 
         liftL.setPosition(.7);
         liftR.setPosition(.25);
-        driveStraight(.4,58,0 );
-turnToHeading(1, -88 );
-driveStraight(.4, 87, -88);
-StrafeDist(.4, 7, -88);
+        driveStraight(.4, 51, 0);
+        turnToHeading(1, -88);
+        driveStraight(.4, 89, -88);
 
 
 

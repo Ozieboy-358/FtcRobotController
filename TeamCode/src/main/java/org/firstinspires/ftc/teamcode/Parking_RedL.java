@@ -178,8 +178,8 @@ public class Parking_RedL extends LinearOpMode {
         leftMotor2 = hardwareMap.dcMotor.get("left motor 2");
         rightMotor1 = hardwareMap.dcMotor.get("right motor 1");
         rightMotor2 = hardwareMap.dcMotor.get("right motor 2");
-        Servo liftL = hardwareMap.servo.get("liftL");
         Servo liftR = hardwareMap.servo.get("liftR");
+        Servo liftL = hardwareMap.servo.get("liftL");
         initOpenCV();
 
         // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.

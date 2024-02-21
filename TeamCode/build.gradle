@@ -30,6 +30,7 @@ repositories {
 
 dependencies {
     implementation project(':FtcRobotController')
+    implementation 'com.google.ar:core:1.41.0'
     annotationProcessor files('lib/OpModeAnnotationProcessor.jar')
     implementation "com.acmerobotics.roadrunner:ftc:0.1.12"
     implementation "com.acmerobotics.dashboard:dashboard:0.4.15"
